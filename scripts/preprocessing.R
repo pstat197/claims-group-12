@@ -42,7 +42,8 @@ nlp_fn <- function(parse_data.out){
   out <- parse_data.out %>% 
     unnest_tokens(output = token, 
                   input = text_clean, 
-                  token = 'words',
+                  token = 'ngrams',
+                  n = 2,
                   stopwords = str_remove_all(stop_words$word, 
                                              '[[:punct:]]')) %>%
     mutate(token.lem = lemmatize_words(token)) %>%
