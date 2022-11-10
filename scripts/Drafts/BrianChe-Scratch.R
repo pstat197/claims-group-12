@@ -1,10 +1,16 @@
 library(keras)
 library(tensorflow)
-
-library(openssl)
-
 library(reticulate)
+ # library(openssl)
+
+
 py_config()
+
+library(tensorflow)
 tf$constant('Hello world')
-conda_create("r-reticulate")
-use_condaenv("r-reticulate")
+
+reticulate::conda_version()
+sessionInfo()
+
+# conda_create("r-reticulate")
+# use_condaenv("r-reticulate")
