@@ -82,4 +82,7 @@ history <- model %>%
 model$weights
 evaluate(model, test_text, test_labels)
 
+# model has accuracy of 0.81 which is higher than 
+# the accuracy of 0.77 we got in task 1
+
 
