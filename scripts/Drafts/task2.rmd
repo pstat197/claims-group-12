@@ -23,6 +23,10 @@ library(stopwords)
   #parse_data()
 claims_clean
 ```
+```{r}
+invitation_text %>% claims_clean(n = 2)
+```
+
 
 ```{r}
 stpwrd <- stop_words %>%
@@ -35,5 +39,17 @@ claims_tokens_long <- claims_clean %>%
                 token = 'words', # how to tokenize
                 stopwords = stpwrd) %>% # optional stopword removal
   mutate(token = lemmatize_words(token)) 
+```
+```{r}
+install.packages("magrittr") # package installations are only needed the first time you use it
+install.packages("dplyr")    # alternative installation of the %>%
+library(magrittr) # needs to be run every time you start R and want to use %>%
+library(dplyr)    # alternatively, this also loads %>%
+```
+
+```{r}
+library(tokenizers)
+#invitation_text %>% tokenize_words()
+invitation_text %>% tokenize_ngrams(n = 2)
 ```
 
