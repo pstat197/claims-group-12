@@ -91,7 +91,7 @@ train_labels <- training(partitions) %>%
   pull(bclass) %>%
   as.numeric() - 1
 
-
+train_text
 # creating test set
 
 test_text <- testing(partitions) %>%
@@ -146,3 +146,4 @@ evaluate(model, test_text, test_labels)
 
 # save the entire model as a SavedModel
 save_model_tf(model, "results/example-model")
+

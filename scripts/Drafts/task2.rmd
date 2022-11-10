@@ -8,6 +8,32 @@ output: html_document
 Perform a secondary tokenization of the data to obtain bigrams. Fit a logistic principal component regression model to the word-tokenized data, and then input the predicted log-odds-ratios together with some number of principal components of the bigram-tokenized data to a second logistic regression model. Based on the results, does it seem like the bigrams capture additional information about the claims status of a page?
 
 ```{r}
+# setup
+library(tidyverse)
+library(tidytext)
+library(tokenizers)
+library(textstem)
+library(stopwords)
+```
 
+```{r}
+#load('/Users/xuao/Documents/2022Fall/Pstat197/claims-group-12/data/claims-raw.RData')
+# preprocess (will take a minute or two)
+#claims_clean <- claims_raw %>%
+  #parse_data()
+claims_clean
+```
+
+```{r}
+stpwrd <- stop_words %>%
+  pull(word) %>%
+  str_remove_all('[[:punct:]]')
+
+claims_tokens_long <- claims_clean %>%
+  unnest_tokens(output = token, # specifies new column name
+                input = text, # specifies column containing text
+                token = 'words', # how to tokenize
+                stopwords = stpwrd) %>% # optional stopword removal
+  mutate(token = lemmatize_words(token)) 
 ```
 
