@@ -82,5 +82,4 @@ history <- model %>%
 model$weights
 evaluate(model, test_text, test_labels)
 
-# save the entire model as a SavedModel
-save_model_tf(model, "results/example-model")
+
