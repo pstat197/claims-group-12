@@ -53,6 +53,8 @@ preprocess_layer <- layer_text_vectorization(
 
 preprocess_layer %>% adapt(train_text)
 
+
+# changed layer_dropout from 0.25 to 0.75
 # define NN architecture
 model <- keras_model_sequential() %>%
   preprocess_layer() %>%
