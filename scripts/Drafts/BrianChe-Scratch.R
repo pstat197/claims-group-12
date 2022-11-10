@@ -36,9 +36,20 @@ url <- 'https://raw.githubusercontent.com/pstat197/pstat197a/main/materials/labs
 
 # read in data
 clean <- read_csv(url)
+clean
 
-head(clean)
 
+# perform word tokenization
+word_tokens <- clean$text_clean %>% tokenize_words
+
+# perform tokenization of the data to obtain bigrams
+bigram_tokens <- clean$text_clean %>% tokenize_ngrams(n = 2)
+
+# Fit a logistic principal component regression model to the word-tokenized data
+
+
+
+# ========================================================================================== #
 # data partitioning
 # partition
 set.seed(102722)
@@ -63,3 +74,7 @@ train_dtm <- training(partitions) %>%
               values_from = tf_idf,
               values_fill = 0) %>%
   ungroup()
+
+
+train_dtm
+  
