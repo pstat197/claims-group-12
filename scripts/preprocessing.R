@@ -38,7 +38,7 @@ parse_data <- function(.df){
   return(out)
 }
 
-nlp_fn <- function(parse_data.out){
+nlp_fn2 <- function(parse_data.out){
   out <- parse_data.out %>% 
     unnest_tokens(output = token, 
                   input = text_clean, 
