@@ -24,7 +24,33 @@ library(stopwords)
 #claims_clean
 ```
 ```{r}
+load('/Users/xuao/Documents/2022Fall/Pstat197/claims-group-12/data/claims-raw.RData')
+load('/Users/xuao/Documents/2022Fall/Pstat197/claims-group-12/data/claims-test.Rdata')
+load('/Users/xuao/Documents/2022Fall/Pstat197/claims-group-12/data/claims-clean-example.Rdata')
+```
+```{r}
+ls()
+```
+```{r}
+# Task Two
+claims_bigrams <- claims_clean %>% 
+  nlp_fn2()
+```
+
+```{r}
+# partition data
+set.seed(198888)
+partitions <- claims_bigrams %>% initial_split(prop = 0.8)
+```
+
+
+```{r}
+cc=claims_clean[,c('Age','Gender')]
 claims_clean %>% tokenize_words()
+```
+
+
+```{r}
 ```
 
 
