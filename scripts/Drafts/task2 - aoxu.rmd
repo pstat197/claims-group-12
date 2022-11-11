@@ -21,7 +21,7 @@ library(stopwords)
 # preprocess (will take a minute or two)
 #claims_clean <- claims_raw %>%
   #parse_data()
-#claims_clean
+claims_clean
 ```
 ```{r}
 load('/Users/xuao/Documents/2022Fall/Pstat197/claims-group-12/data/claims-raw.RData')
@@ -40,51 +40,46 @@ claims_bigrams <- claims_clean %>%
 ```{r}
 # partition data
 set.seed(198888)
-partitions <- claims_bigrams %>% initial_split(prop = 0.8)
+# partitions <- claims_bigrams %>% initial_split(prop = 0.8)
 ```
 
 
 ```{r}
-cc=claims_clean[,c('Age','Gender')]
-claims_clean %>% tokenize_words()
+# separate DTM from labels
+#test_dtm <- testing(partitions) %>%
+  #select(-.id, -bclass)
+#test_labels <- testing(partitions) %>%
+  #select(.id, bclass)
+
+# same, training set
+#train_dtm <- training(partitions) %>%
+  #select(-.id, -bclass)
+#train_labels <- training(partitions) %>%
+  #select(.id, bclass)
 ```
 
 
 ```{r}
-```
+# find projections based on training data
+proj_out <- projection_fn(.dtm = train_dtm, .prop = 0.7)
+train_dtm_projected <- proj_out$data
 
 
-```{r}
-invitation_text %>% claims_clean(n = 2)
-```
+train <- train_labels %>%
+  transmute(bclass = factor(bclass)) %>%
+  bind_cols(train_dtm_projected)
+
+fit <- glm(bclass ~ ., data = train, 'binomial')
 
 
-```{r}
-```
+x_train <- train %>% select(-bclass) %>% as.matrix()
+y_train <- train_labels %>% pull(bclass)
 
-
-```{r}
-stpwrd <- stop_words %>%
-  pull(word) %>%
-  str_remove_all('[[:punct:]]')
-
-claims_tokens_long <- claims_clean %>%
-  unnest_tokens(output = token, # specifies new column name
-                input = text, # specifies column containing text
-                token = 'words', # how to tokenize
-                stopwords = stpwrd) %>% # optional stopword removal
-  mutate(token = lemmatize_words(token)) 
-```
-```{r}
-install.packages("magrittr") # package installations are only needed the first time you use it
-install.packages("dplyr")    # alternative installation of the %>%
-library(magrittr) # needs to be run every time you start R and want to use %>%
-library(dplyr)    # alternatively, this also loads %>%
-```
-
-```{r}
-library(tokenizers)
-#invitation_text %>% tokenize_words()
-invitation_text %>% tokenize_ngrams(n = 2)
+# fit enet model
+alpha_enet <- 0.3
+fit_reg <- glmnet(x = x_train, 
+                  y = y_train, 
+                  family = 'binomial',
+                  alpha = alpha_enet)
 ```
 
