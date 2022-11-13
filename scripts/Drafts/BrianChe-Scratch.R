@@ -26,6 +26,7 @@ library(tokenizers)
 library(textstem)
 library(stopwords)
 library(tidymodels)
+library(dplyr)
 
 library(keras)
 library(tensorflow)
@@ -45,7 +46,54 @@ word_tokens <- clean$text_clean %>% tokenize_words
 # perform tokenization of the data to obtain bigrams
 bigram_tokens <- clean$text_clean %>% tokenize_ngrams(n = 2)
 
+
+word_tokens
+bigram_tokens
+
+# obtaining an (n x p) document term matrix for the word tokens (predictors) 
+clean$bclass
+
+
+# obtain an (n x 1) vector of binary class labels (response).
+
+#################
+# partition data
+set.seed(102722)
+partitions <- clean %>% initial_split(prop = 0.8)
+
+# separate DTM from labels
+test_dtm <- testing(partitions) %>%
+  select(-.id, -bclass)
+test_labels <- testing(partitions) %>%
+  select(.id, bclass)
+
+# same, training set
+train_dtm <- training(partitions) %>%
+  select(-.id, -bclass)
+train_labels <- training(partitions) %>%
+  select(.id, bclass)
+
+test_dtm
+train_dtm
+
+# find projections based on training data
+proj_out <- projection_fn(.dtm = train_dtm, .prop = 0.7)
+train_dtm_projected <- proj_out$data
+
+train <- train_labels %>%
+  transmute(bclass = factor(bclass)) %>%
+  bind_cols(train_dtm_projected)
+
+fit <- glm(bclass ~ ., data = train, 'binomial')
+
+
+x_train <- train %>% select(-bclass) %>% as.matrix()
+y_train <- train_labels %>% pull(bclass)
+
+#################
+
 # Fit a logistic principal component regression model to the word-tokenized data
+
 
 
 
@@ -75,6 +123,12 @@ train_dtm <- training(partitions) %>%
               values_fill = 0) %>%
   ungroup()
 
-
 train_dtm
-  
+train_dtm$bclass
+
+table(train_dtm$bclass)
+
+vec <- pull(train_dtm, bclass)
+vec  
+
+train_dtm$bclass
