@@ -8,6 +8,8 @@ date: today
 
 Does including header content improve predictions? Answer the question and provide quantitative evidence supporting your answer.
 
+Including the header improved our predictions by almost 2% accuracy. Before the header was included, our neural network model had a binary classification accuracy of 0.75, and after including the headers, the model's binary classification accuracy was 0.77.
+
 ### Bigrams
 
 Do bigrams capture additional information relevant to the classification of interest? Answer the question, **briefly** describe what analysis you conducted to arrive at your answer, and provide quantitative evidence supporting your answer.
@@ -16,10 +18,10 @@ Do bigrams capture additional information relevant to the classification of inte
 
 Summarize the neural network model you trained by desribing:
 
--   architecture
+-   architecture: For the architecture of the Neural Network model we trained, we applied the preprocessing layer, changed the layer_dropout to 0.75 instead of the original 0.25, we kept the first layer_dense to 25 units, and also kept the second layer_dense to 1 unit.
 
--   optimization and loss
+-   optimization and loss: We kept loss as binary cross entropy and the optimizer remained as 'adam'
 
--   training epochs
+-   training epochs: We kept the number of training epochs at 5.
 
--   predictive accuracy
+-   predictive accuracy: Each of these components resulted in a predictive accuracy of 0.81 on the test set.
