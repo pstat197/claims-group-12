@@ -1,0 +1,61 @@
+---
+title: "task2-aoxu"
+author: "AO XU"
+date: "2022-11-08"
+output: html_document
+---
+
+Perform a secondary tokenization of the data to obtain bigrams. Fit a logistic principal component regression model to the word-tokenized data, and then input the predicted log-odds-ratios together with some number of principal components of the bigram-tokenized data to a second logistic regression model. Based on the results, does it seem like the bigrams capture additional information about the claims status of a page?
+
+```{r}
+# setup
+library(tidyverse)
+library(tidytext)
+library(tokenizers)
+library(textstem)
+library(stopwords)
+```
+
+
+```{r}
+load('/Users/xuao/Documents/2022Fall/Pstat197/claims-group-12/data/claims-raw.RData')
+load('/Users/xuao/Documents/2022Fall/Pstat197/claims-group-12/data/claims-test.Rdata')
+load('/Users/xuao/Documents/2022Fall/Pstat197/claims-group-12/data/claims-clean-example.Rdata')
+```
+```{r}
+ls()
+```
+```{r}
+# We change the preprocessing.r firstly and then use npl_fn2()
+claims_bigrams <- claims_clean %>% 
+  nlp_fn2()
+```
+
+```{r}
+# partition data
+library(tidymodels)
+set.seed(198888)
+partitions <- claims_bigrams %>% initial_split(prop = 0.8)
+```
+
+```{r}
+# To separate DTM from labels, we set dtm and labels
+testset_dtm <- testing(partitions) %>%
+  select(-.id, -bclass)
+testset_labels <- testing(partitions) %>%
+  select(.id, bclass)
+trainset_dtm <- training(partitions) %>%
+  select(-.id, -bclass)
+trainset_labels <- training(partitions) %>%
+  select(.id, bclass)
+```
+
+
+
+
+
+
+
+
+
+

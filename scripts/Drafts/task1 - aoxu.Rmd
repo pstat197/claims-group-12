@@ -1,0 +1,16 @@
+---
+title: "task1-aoxu"
+author: "AO XU"
+date: "2022-11-09"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+load('/Users/xuao/Documents/2022Fall/Pstat197/claims-group-12/data/claims-raw.RData')
+dataRDS <- readRDS("claims-raw.RData")
+```
+
