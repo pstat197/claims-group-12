@@ -124,7 +124,7 @@ x_test <- as.matrix(test_dtm_projected)
 preds <- predict(fit_reg, 
                  s = lambda_opt, 
                  newx = x_test,
-                 type = 'response')
+                 type = 'link')
 
 # store predictions in a data frame with true labels
 pred_df <- test_labels %>%
@@ -202,30 +202,67 @@ train_bigrams  <- train_bigrams_labels %>%
   transmute(bclass = factor(bclass)) %>%
   bind_cols(train_bigrams_dtm_projected)
 
-fit <- glm(bclass ~ ., 
-           data = train_bigrams, 
-           offsett = preds, 
-           family = 'binomial')
-
-# fit <- glm(bclass ~ ., 
-#            data = train_bigrams_dtm, 
-#            offest = preds, 
-#            family = 'binomial')
-
 x_train_bigrams <- train_bigrams  %>% select(-bclass) %>% as.matrix()
 y_train_bigrams <- train_bigrams_labels %>% pull(bclass)
 
 # fit  model
-fit_bigrams <- glmnet(y = y_train_bigrams,
-                          x = x_train_bigrams, 
-                          offset = preds,
-                          family = 'binomial')
-
-fit_reg_bigrams
+fit_bigrams <- glmnet(x = x_train_bigrams,
+              y = y_train_bigrams, 
+              offest = preds, 
+              family = 'binomial')
 
 #### STEP 7
 # Compare predictive accuracy between the model in step 3 and the model in step 6
 
+# choose a strength by cross-validation
+set.seed(102722)
+cvout <- cv.glmnet(x = x_train_bigrams, 
+                   y = y_train_bigrams, 
+                   family = 'binomial',
+                   alpha = alpha_enet)
+
+# store optimal strength
+lambda_opt <- cvout$lambda.min
+
+# view results
+cvout
+
+# project test data onto PCs
+test_bigrams_dtm_projected <- reproject_fn(.dtm = test_bigrams_dtm, proj_bigrams_out)
+
+# coerce to matrix
+x_test_bigrams <- as.matrix(test_bigrams_dtm_projected)
+
+# compute predicted probabilities
+preds_bigram <- predict(fit_bigrams, 
+                 s = lambda_opt, 
+                 newx = x_test_bigrams,
+                 type = 'link')
+
+
+
+# store predictions in a data frame with true labels
+pred_df <- test_bigrams_labels %>%
+  transmute(bclass = factor(bclass)) %>%
+  bind_cols(pred = as.numeric(preds_bigram)) %>%
+  mutate(bclass.pred = factor(pred > 0.5, 
+                              labels = levels(bclass)))
+
+# define classification metric panel 
+panel <- metric_set(sensitivity, 
+                    specificity, 
+                    accuracy, 
+                    roc_auc)
+
+# compute test set accuracy
+pred_df %>% panel(truth = bclass, 
+                  estimate = bclass.pred, 
+                  pred, 
+                  event_level = 'second')
+
+
+
+test_bigrams_dtm_projected
 
 
 
