@@ -19,6 +19,9 @@
 # bigram-tokenized data to a second logistic regression model. Based on the results, does it seem like the bigrams capture additional 
 # information about the claims status of a page?
 
+
+source('https://raw.githubusercontent.com/pstat197/pstat197a/main/materials/scripts/package-installs.R')
+
 # packages
 library(tidyverse)
 library(tidytext)
@@ -46,7 +49,6 @@ word_tokens <- clean$text_clean %>% tokenize_words
 # perform tokenization of the data to obtain bigrams
 bigram_tokens <- clean$text_clean %>% tokenize_ngrams(n = 2)
 
-
 word_tokens
 bigram_tokens
 
@@ -66,6 +68,8 @@ test_dtm <- testing(partitions) %>%
   select(-.id, -bclass)
 test_labels <- testing(partitions) %>%
   select(.id, bclass)
+
+
 
 # same, training set
 train_dtm <- training(partitions) %>%
@@ -132,3 +136,4 @@ vec <- pull(train_dtm, bclass)
 vec  
 
 train_dtm$bclass
+
