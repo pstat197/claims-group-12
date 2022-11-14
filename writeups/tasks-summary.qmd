@@ -16,7 +16,7 @@ Do bigrams capture additional information relevant to the classification of inte
 
 ### Neural net
 
-Summarize the neural network model you trained by desribing:
+Summarize the neural network model you trained by describing:
 
 -   architecture: For the architecture of the Neural Network model we trained, we applied the preprocessing layer, changed the layer_dropout to 0.75 instead of the original 0.25, we kept the first layer_dense to 25 units, and also kept the second layer_dense to 1 unit.
 
