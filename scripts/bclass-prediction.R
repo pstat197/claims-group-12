@@ -16,10 +16,10 @@ save(claims_clean, file = 'data/claims-clean-example.RData')
 
 ## MODEL TRAINING (NN)
 ######################
-library(tidyverse)
-library(tidymodels)
-library(keras)
-library(tensorflow)
+require(tidyverse)
+require(tidymodels)
+require(keras)
+require(tensorflow)
 
 # load cleaned data
 load('data/claims-clean-example.RData')
@@ -58,7 +58,7 @@ preprocess_layer %>% adapt(train_text)
 model <- keras_model_sequential() %>%
   preprocess_layer() %>%
   layer_dropout(0.75) %>%
-  layer_dense(units = 50) %>%
+  layer_dense(units = 25) %>%
   layer_dropout(0.25) %>%
   layer_dense(1) %>%
   layer_activation(activation = 'sigmoid')
