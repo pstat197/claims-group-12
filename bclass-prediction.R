@@ -5,7 +5,7 @@ library(tidymodels)
 library(modelr)
 library(Matrix)
 library(sparsesvd)
-library(glmnet)
+library(glmnet) 
 
 # load functions
 url <- 'https://raw.githubusercontent.com/pstat197/pstat197a/main/materials/activities/data/'
