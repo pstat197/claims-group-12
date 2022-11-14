@@ -82,6 +82,79 @@ proj_out$n_pc
 train_dtm_projected
 
 #### STEP 3
+# Fit a logistic regression model with the PC’s obtained in the previous step as predictors and the class labels as response
+# store predictors and response as matrix and vector
+x_train <- train %>% select(-bclass) %>% as.matrix()
+y_train <- train_labels %>% pull(bclass)
+
+# fit enet model
+alpha_enet <- 0.3
+fit_reg <- glmnet(x = x_train, 
+                  y = y_train, 
+                  family = 'binomial',
+                  alpha = alpha_enet)
+
+#### STEP 4
+# Compute and store predictions
+
+# choose a strength by cross-validation
+set.seed(102722)
+cvout <- cv.glmnet(x = x_train, 
+                   y = y_train, 
+                   family = 'binomial',
+                   alpha = alpha_enet)
+
+# store optimal strength
+lambda_opt <- cvout$lambda.min
+
+# view results
+cvout
+
+# project test data onto PCs
+test_dtm_projected <- reproject_fn(.dtm = test_dtm, proj_out)
+
+# coerce to matrix
+x_test <- as.matrix(test_dtm_projected)
+
+# compute predicted probabilities
+preds <- predict(fit_reg, 
+                 s = lambda_opt, 
+                 newx = x_test,
+                 type = 'response')
+
+# store predictions in a data frame with true labels
+pred_df <- test_labels %>%
+  transmute(bclass = factor(bclass)) %>%
+  bind_cols(pred = as.numeric(preds)) %>%
+  mutate(bclass.pred = factor(pred > 0.5, 
+                              labels = levels(bclass)))
+
+# define classification metric panel 
+panel <- metric_set(sensitivity, 
+                    specificity, 
+                    accuracy, 
+                    roc_auc)
+
+# compute test set accuracy
+pred_df %>% panel(truth = bclass, 
+                  estimate = bclass.pred, 
+                  pred, 
+                  event_level = 'second')
+
+#### STEP 5
+# Repeat 1-2 but using bigram tokenization in step 1
+
+#### STEP 6
+# Repeat step 3 using the bigram PCs, but add to your model the predictions obtained in step 4 as an offset
+
+
+#### STEP 7
+# Compare predictive accuracy between the model in step 3 and the model in step 6
+
+
+
+
+### RANDOM
 #  Fit a logistic regression model with the PC’s obtained in the previous step as predictors and the class labels as response
 train <- train_labels %>%
   transmute(bclass = factor(bclass)) %>%
@@ -90,15 +163,3 @@ train <- train_labels %>%
 fit <- glm(formula=bclass~., data = train, family='binomial')
 
 summary(fit)
-
-# Compute and store predictions
-probabilities <- fit %>% predict(train, type = "response")
-predicted.classes <- ifelse(probabilities > 0.5, "pos", "neg")
-mean(predicted.classes == train$bclass)
-
-# Repeat 1-2 but using bigram tokenization in step 1
-
-# Repeat step 3 using the bigram PCs, but add to your model the predictions obtained in step 4 as an offset
-
-#################
-
