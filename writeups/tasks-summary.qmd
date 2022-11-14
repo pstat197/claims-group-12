@@ -8,7 +8,7 @@ date: today
 
 Does including header content improve predictions? Answer the question and provide quantitative evidence supporting your answer.
 
-Including the header improved our predictions by almost 2% accuracy. Before the header was included, our neural network model had a binary classification accuracy of 0.75, and after including the headers, the model's binary classification accuracy was 0.77.
+In order to include the header as apart of the text we included 'h' along with 'p' in the html elements of the text parsing of the preprocessing code. Including the header improved our predictions by almost 2% accuracy. Before the header was included, our neural network model had a binary classification accuracy of 0.75, and after including the headers, the model's binary classification accuracy was 0.77. Our group came to the conclusion that th4e header of a webpage should be included in any further models we design in this project.
 
 ### Bigrams
 
