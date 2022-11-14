@@ -24,4 +24,4 @@ Summarize the neural network model you trained by describing:
 
 -   training epochs: We kept loss as binary cross entropy and the optimizer remained as 'adam'
 
--   predictive accuracy: Each of these components resulted in a predictive accuracy of 0.81 on the test set.
+-   predictive accuracy: Each of these components resulted in a predictive accuracy of 0.81 on the test set. This is a 3% improvement from the neural network model in task 1 which had a predictive accuracy of 0.77.
