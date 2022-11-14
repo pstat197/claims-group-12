@@ -8,6 +8,18 @@ require(qdapRegex)
 require(stopwords)
 require(tokenizers)
 
+library(tidymodels)
+library(modelr)
+library(Matrix)
+library(sparsesvd)
+library(glmnet)
+
+# path to activity files on repo
+url <- 'https://raw.githubusercontent.com/pstat197/pstat197a/main/materials/activities/data/'
+
+# load a few functions for the activity
+source(paste(url, 'projection-functions.R', sep = ''))
+
 # function to parse html and clean text
 parse_fn <- function(.html){
   read_html(.html) %>%
@@ -58,9 +70,6 @@ nlp_fn <- function(parse_data.out){
   return(out)
 }
 
-# can comment entire section out if no changes to preprocessing.R
-source('scripts/preprocessing.R')
-
 # load raw data
 load('data/claims-raw.RData')
 # preprocess (will take a minute or two)
@@ -70,12 +79,7 @@ claims_clean <- claims_raw %>%
 # export
 save(claims_clean, file = 'data/claims-clean-example.RData')
 
-## MODEL TRAINING (NN)
-######################
-library(tidyverse)
-library(tidymodels)
-library(keras)
-library(tensorflow)
+
 
 # load cleaned data
 load('data/claims-clean-example.RData')
@@ -91,7 +95,6 @@ train_labels <- training(partitions) %>%
   pull(bclass) %>%
   as.numeric() - 1
 
-train_text
 # creating test set
 
 test_text <- testing(partitions) %>%
@@ -104,7 +107,7 @@ test_labels <- testing(partitions) %>%
 preprocess_layer <- layer_text_vectorization(
   standardize = NULL,
   split = 'whitespace',
-  ngrams = NULL,
+  ngrams = 2,
   max_tokens = NULL,
   output_mode = 'tf_idf'
 )

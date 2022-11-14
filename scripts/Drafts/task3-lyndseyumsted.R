@@ -8,18 +8,7 @@
 ## PREPROCESSING
 #################
 
-# can comment entire section out if no changes to preprocessing.R
-source('scripts/preprocessing.R')
-
-# load raw data
-load('data/claims-raw.RData')
-
-# preprocess (will take a minute or two)
-claims_clean <- claims_raw %>%
-  parse_data()
-
-# export
-save(claims_clean, file = 'data/claims-clean-example.RData')
+source("scripts/preprocessing copy.R")
 
 ## MODEL TRAINING (NN)
 ######################
@@ -42,16 +31,23 @@ train_labels <- training(partitions) %>%
   pull(bclass) %>%
   as.numeric() - 1
 
+test_text <- testing(partitions) %>%
+  pull(text_clean)
+test_labels <- testing(partitions) %>%
+  pull(bclass) %>%
+  as.numeric() - 1
+
 # create a preprocessing layer
 preprocess_layer <- layer_text_vectorization(
   standardize = NULL,
   split = 'whitespace',
-  ngrams = NULL,
+  ngrams = 2,
   max_tokens = NULL,
   output_mode = 'tf_idf'
 )
 
-preprocess_layer %>% adapt(train_text)
+preprocess_layer <- 
+  preprocess_layer %>% adapt(train_text)
 
 
 # changed layer_dropout from 0.25 to 0.75
