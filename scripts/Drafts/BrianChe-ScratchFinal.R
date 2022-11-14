@@ -67,30 +67,6 @@ test_labels %>%
 train_labels %>%
   select(bclass)
 
-#  Adjust preprocessing for a claims_bigrams version we will use
-claims_bigrams <- clean %>% 
-  nlp_fn2()
-
-# partition data for claims_bigrams
-set.seed(198888)
-partitions_bigrams  <- claims_bigrams %>% initial_split(prop = 0.8)
-
-# separate DTM from labels
-test_bigrams_dtm <- testing(partitions_bigrams) %>%
-  select(-.id, -bclass, -mclass)
-test_bigrams_labels <- testing(partitions_bigrams) %>%
-  select(.id, bclass, mclass)
-
-test_bigrams_dtm
-
-# same, training set
-train_dtm <- training(partitions) %>%
-  select(-.id, -bclass, -mclass)
-train_labels <- training(partitions) %>%
-  select(.id, bclass, mclass)
-
-claims_bigrams
-
 
 #### STEP 2
 # Project the DTM onto a number of principal components k of your choosing
@@ -119,7 +95,6 @@ fit_reg <- glmnet(x = x_train,
 
 #### STEP 4
 # Compute and store predictions
-
 # choose a strength by cross-validation
 set.seed(102722)
 cvout <- cv.glmnet(x = x_train, 
@@ -167,11 +142,58 @@ pred_df %>% panel(truth = bclass,
 #### STEP 5
 # Repeat 1-2 but using bigram tokenization in step 1
 
+#  Adjust preprocessing for a claims_bigrams version we will use
+claims_bigrams <- clean %>% 
+  nlp_fn2()
 
+# partition data for claims_bigrams
+set.seed(198888)
+partitions_bigrams  <- claims_bigrams %>% initial_split(prop = 0.8)
+
+# separate DTM from labels
+test_bigrams_dtm <- testing(partitions_bigrams) %>%
+  select(-.id, -bclass)
+test_bigrams_labels <- testing(partitions_bigrams) %>%
+  select(.id, bclass)
+
+test_bigrams_dtm
+
+# same, training set
+train_bigrams_dtm <- training(partitions_bigrams) %>%
+  select(-.id, -bclass)
+train_bigrams_labels <- training(partitions_bigrams) %>%
+  select(.id, bclass)
+
+# (n x p) document term matrix for the word tokens (predictors) 
+test_bigrams_dtm
+train_bigrams_dtm
+
+# (n x 1) vector of binary class labels (response).
+test_bigrams_labels %>%
+  select(bclass)
+train_bigrams_labels %>%
+  select(bclass)
+
+# Project the DTM onto a number of principal components k of your choosing
+# find projections based on training data
+proj_bigrams_out <- projection_fn(.dtm = train_bigrams_dtm, .prop = 0.7)
+
+train_bigrams_dtm
+train_bigrams_dtm_projected <- proj_bigrams_out$data
+
+# how many components were used?
+proj_bigrams_out$n_pc
+
+# (n x k) matrix of PC values.
+train_bigrams_dtm_projected
 
 #### STEP 6
 # Repeat step 3 using the bigram PCs, but add to your model the predictions obtained in step 4 as an offset
 
+fit <- glm(bclass ~ ., 
+           data = train_bigrams, 
+           offest = preds, 
+           family = 'binomial')
 
 #### STEP 7
 # Compare predictive accuracy between the model in step 3 and the model in step 6
