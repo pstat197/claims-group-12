@@ -83,6 +83,12 @@ train_dtm_projected
 #### STEP 3
 # Fit a logistic regression model with the PC’s obtained in the previous step as predictors and the class labels as response
 # store predictors and response as matrix and vector
+train <- train_labels %>%
+  transmute(bclass = factor(bclass)) %>%
+  bind_cols(train_dtm_projected)
+
+# fit <- glm(..., data = train, ...)
+
 x_train <- train %>% select(-bclass) %>% as.matrix()
 y_train <- train_labels %>% pull(bclass)
 
@@ -178,7 +184,6 @@ train_bigrams_labels %>%
 # find projections based on training data
 proj_bigrams_out <- projection_fn(.dtm = train_bigrams_dtm, .prop = 0.7)
 
-train_bigrams_dtm
 train_bigrams_dtm_projected <- proj_bigrams_out$data
 
 # how many components were used?
@@ -190,10 +195,33 @@ train_bigrams_dtm_projected
 #### STEP 6
 # Repeat step 3 using the bigram PCs, but add to your model the predictions obtained in step 4 as an offset
 
+
+# Fit a logistic regression model with the PC’s obtained in the previous step as predictors and the class labels as response
+# store predictors and response as matrix and vector
+train_bigrams  <- train_bigrams_labels %>%
+  transmute(bclass = factor(bclass)) %>%
+  bind_cols(train_bigrams_dtm_projected)
+
 fit <- glm(bclass ~ ., 
            data = train_bigrams, 
-           offest = preds, 
+           offsett = preds, 
            family = 'binomial')
+
+# fit <- glm(bclass ~ ., 
+#            data = train_bigrams_dtm, 
+#            offest = preds, 
+#            family = 'binomial')
+
+x_train_bigrams <- train_bigrams  %>% select(-bclass) %>% as.matrix()
+y_train_bigrams <- train_bigrams_labels %>% pull(bclass)
+
+# fit  model
+fit_bigrams <- glmnet(y = y_train_bigrams,
+                          x = x_train_bigrams, 
+                          offset = preds,
+                          family = 'binomial')
+
+fit_reg_bigrams
 
 #### STEP 7
 # Compare predictive accuracy between the model in step 3 and the model in step 6
