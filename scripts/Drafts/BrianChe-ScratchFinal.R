@@ -16,6 +16,7 @@ url <- 'https://raw.githubusercontent.com/pstat197/pstat197a/main/materials/acti
 
 # load a few functions for the activity
 source(paste(url, 'projection-functions.R', sep = ''))
+source('scripts/preprocessing.R')
 
 # read in data
 claims <- paste(url, 'claims-multi-tfidf.csv', sep = '') %>%
@@ -44,9 +45,6 @@ bigram_tokens <- clean$text_clean %>% tokenize_ngrams(n = 2)
 set.seed(102722)
 partitions <- claims %>% initial_split(prop = 0.8)
 
-claims
-word_tokens
-
 # separate DTM from labels
 test_dtm <- testing(partitions) %>%
   select(-.id, -bclass, -mclass)
@@ -68,6 +66,31 @@ test_labels %>%
   select(bclass)
 train_labels %>%
   select(bclass)
+
+#  Adjust preprocessing for a claims_bigrams version we will use
+claims_bigrams <- clean %>% 
+  nlp_fn2()
+
+# partition data for claims_bigrams
+set.seed(198888)
+partitions_bigrams  <- claims_bigrams %>% initial_split(prop = 0.8)
+
+# separate DTM from labels
+test_bigrams_dtm <- testing(partitions_bigrams) %>%
+  select(-.id, -bclass, -mclass)
+test_bigrams_labels <- testing(partitions_bigrams) %>%
+  select(.id, bclass, mclass)
+
+test_bigrams_dtm
+
+# same, training set
+train_dtm <- training(partitions) %>%
+  select(-.id, -bclass, -mclass)
+train_labels <- training(partitions) %>%
+  select(.id, bclass, mclass)
+
+claims_bigrams
+
 
 #### STEP 2
 # Project the DTM onto a number of principal components k of your choosing
@@ -143,6 +166,8 @@ pred_df %>% panel(truth = bclass,
 
 #### STEP 5
 # Repeat 1-2 but using bigram tokenization in step 1
+
+
 
 #### STEP 6
 # Repeat step 3 using the bigram PCs, but add to your model the predictions obtained in step 4 as an offset
