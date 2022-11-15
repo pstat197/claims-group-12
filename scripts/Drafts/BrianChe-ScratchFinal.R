@@ -239,7 +239,7 @@ preds_bigram <- predict(fit_bigrams,
                  newx = x_test_bigrams,
                  type = 'link')
 
-
+preds_bigram
 
 # store predictions in a data frame with true labels
 pred_df <- test_bigrams_labels %>%
