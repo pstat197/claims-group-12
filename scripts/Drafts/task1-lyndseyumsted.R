@@ -77,7 +77,7 @@ claims_clean <- claims_raw %>%
   parse_data()
 
 # export
-save(claims_clean, file = 'data/claims-clean-example.RData')
+# save(claims_clean, file = 'data/claims-clean-example.RData')
 
 
 
@@ -114,7 +114,8 @@ train <- train_labels %>%
   transmute(bclass = factor(bclass)) %>%
   bind_cols(train_dtm_projected)
 
-fit <- glm(bclass ~ ., data = train, family = "binomial")
+fit <- glm(bclass ~ ., data = train, family = binomial)
+
 
 
 
