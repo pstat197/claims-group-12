@@ -2,7 +2,7 @@
 
 ## PREPROCESSING
 #################
-source('scripts/preprocessing copy.R')
+source('scripts/preprocessing.R')
 
 # load raw data
 load('data/claims-raw.RData')
@@ -45,7 +45,7 @@ test_labels <- testing(partitions) %>%
 preprocess_layer <- layer_text_vectorization(
   standardize = NULL,
   split = 'whitespace',
-  ngrams = NULL,
+  ngrams = 2,
   max_tokens = NULL,
   output_mode = 'tf_idf'
 )
@@ -57,9 +57,9 @@ preprocess_layer %>% adapt(train_text)
 # define NN architecture
 model <- keras_model_sequential() %>%
   preprocess_layer() %>%
-  layer_dropout(0.75) %>%
+  layer_dropout(0.50) %>%
   layer_dense(units = 25) %>%
-  layer_dropout(0.25) %>%
+  layer_dropout(0.15) %>%
   layer_dense(1) %>%
   layer_activation(activation = 'sigmoid')
 
@@ -68,7 +68,7 @@ summary(model)
 # configure for training
 model %>% compile(
   loss = 'binary_crossentropy',
-  optimizer = 'adam',
+  optimizer = optimizer_sgd(),
   metrics = 'binary_accuracy'
 )
 
