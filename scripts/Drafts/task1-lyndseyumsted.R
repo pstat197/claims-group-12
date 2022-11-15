@@ -89,64 +89,32 @@ set.seed(110122)
 partitions <- claims_clean %>%
   initial_split(prop = 0.8)
 
-train_text <- training(partitions) %>%
-  pull(text_clean)
-train_labels <- training(partitions) %>%
-  pull(bclass) %>%
-  as.numeric() - 1
-
-# creating test set
-
-test_text <- testing(partitions) %>%
-  pull(text_clean)
+# separate DTM from labels
+test_dtm <- testing(partitions) %>%
+  select(-.id, -bclass, -mclass)
 test_labels <- testing(partitions) %>%
-  pull(bclass) %>%
-  as.numeric() - 1
+  select(.id, bclass, mclass)
 
-# create a preprocessing layer
-preprocess_layer <- layer_text_vectorization(
-  standardize = NULL,
-  split = 'whitespace',
-  ngrams = 2,
-  max_tokens = NULL,
-  output_mode = 'tf_idf'
-)
+# same, training set
+train_dtm <- training(partitions) %>%
+  select(-.id, -bclass, -mclass)
+train_labels <- training(partitions) %>%
+  select(.id, bclass, mclass)
 
-preprocess_layer %>% adapt(train_text)
 
-# define NN architecture
-model <- keras_model_sequential() %>%
-  preprocess_layer() %>%
-  layer_dropout(0.2) %>%
-  layer_dense(units = 25) %>%
-  layer_dropout(0.2) %>%
-  layer_dense(1) %>%
-  layer_activation(activation = 'sigmoid')
+# find projections based on training data
+proj_out <- projection_fn(.dtm = train_dtm, .prop = 0.7)
+train_dtm_projected <- proj_out$data
 
-summary(model)
+# how many components were used?
+proj_out$n_pc
 
-# configure for training
-model %>% compile(
-  loss = 'binary_crossentropy',
-  optimizer = 'adam',
-  metrics = 'binary_accuracy'
-)
 
-# train
-history <- model %>%
-  fit(train_text, 
-      train_labels,
-      validation_split = 0.3,
-      epochs = 5)
+train <- train_labels %>%
+  transmute(bclass = factor(bclass)) %>%
+  bind_cols(train_dtm_projected)
 
-## CHECK TEST SET ACCURACY HERE
-model$weights
-evaluate(model, test_text, test_labels)
-# binary accuracy of 0.7734 when including header
+fit <- glm(bclass ~ ., data = train, family = "binomial")
 
-# compared to a binary accuracy 0.75 from the original
-# nlp model without including the header
 
-# save the entire model as a SavedModel
-save_model_tf(model, "results/example-model")
 
