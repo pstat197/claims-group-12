@@ -218,16 +218,16 @@ fit_bigrams <- glmnet(y = y_train_bigrams,
 # choose a strength by cross-validation
 
 set.seed(102722)
-cvout <- cv.glmnet(x = x_train_bigrams, 
+cvout2 <- cv.glmnet(x = x_train_bigrams, 
                    y = y_train_bigrams, 
                    family = 'binomial',
                    alpha = alpha_enet)
 
 # store optimal strength
-lambda_opt <- cvout$lambda.min
+lambda_opt2 <- cvout2$lambda.min
 
 # view results
-cvout
+cvout2
 
 # project test data onto PCs
 test_bigrams_dtm_projected <- reproject_fn(.dtm = test_bigrams_dtm, proj_bigrams_out)
@@ -242,11 +242,11 @@ preds_bigram <- predict(fit_bigrams,
                  type = 'response')
 
 # store predictions in a data frame with true labels
-pred_df <- test_bigrams_labels %>%
+pred_df2 <- test_bigrams_labels %>%
   transmute(bclass = factor(bclass)) %>%
   bind_cols(pred = as.numeric(preds_bigram)) %>%
   mutate(bclass.pred = factor(pred > 0.5, 
-                              labels = levels(bclass)))
+                              labels = 1))
 
 # define classification metric panel 
 panel <- metric_set(sensitivity, 
@@ -254,14 +254,16 @@ panel <- metric_set(sensitivity,
                     accuracy, 
                     roc_auc)
 
-# compute test set accuracy
-pred_df %>% panel(truth = bclass, 
+# compute test set accuracy for step 6
+pred_df2 %>% panel(truth = bclass, 
                   estimate = bclass.pred, 
                   pred, 
                   event_level = 'second')
 
-
-
-test_bigrams_dtm_projected
+# compute test set accuracy for step 3
+pred_df %>% panel(truth = bclass, 
+                  estimate = bclass.pred, 
+                  pred, 
+                  event_level = 'second')
 
 
