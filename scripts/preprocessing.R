@@ -38,6 +38,7 @@ parse_data <- function(.df){
   return(out)
 }
 
+# Here we change the token to be "ngrams" and n = 2
 nlp_fn2 <- function(parse_data.out){
   out <- parse_data.out %>% 
     unnest_tokens(output = token, 
