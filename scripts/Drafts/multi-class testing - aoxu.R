@@ -1,5 +1,16 @@
-source('https://raw.githubusercontent.com/pstat197/pstat197a/main/materials/scripts/package-installs.R')
+source('scripts/preprocessing.R')
+load('data/claims-raw.RData')
 
+# preprocess (will take a minute or two)
+claims_clean <- claims_raw %>%
+  parse_data()
+
+# export
+save(claims_clean, file = 'data/claims-clean-example.RData')
+
+load('data/claims-clean-example.RData')
+
+source('https://raw.githubusercontent.com/pstat197/pstat197a/main/materials/scripts/package-installs.R')
 # packages
 library(tidyverse)
 library(tidymodels)
@@ -23,8 +34,9 @@ claims
 
 # 1
 # partition data
-set.seed(102722)
-partitions <- claims %>% initial_split(prop = 0.8)
+set.seed(108888)
+partitions <- claims_clean %>%
+  initial_split(prop = 0.8)
 
 # separate DTM from labels
 test_dtm <- testing(partitions) %>%
@@ -38,19 +50,19 @@ train_dtm <- training(partitions) %>%
 train_labels <- training(partitions) %>%
   select(.id, bclass, mclass)
 
+
 # find projections based on training data
 proj_out <- projection_fn(.dtm = train_dtm, .prop = 0.7)
 train_dtm_projected <- proj_out$data
 
 # how many components were used?
-proj_out$n_pc
+#proj_out$n_pc
 
-train <- train_labels %>%
-  transmute(bclass = factor(bclass)) %>%
-  bind_cols(train_dtm_projected)
+#train <- train_labels %>%
+  #transmute(bclass = factor(bclass)) %>%
+  #bind_cols(train_dtm_projected)
 
-fit <- glm(..., data = train, ...)
-
+# 2
 # store predictors and response as matrix and vector
 x_train <- train %>% select(-bclass) %>% as.matrix()
 y_train <- train_labels %>% pull(bclass)
@@ -74,6 +86,37 @@ lambda_opt <- cvout$lambda.min
 
 # view results
 cvout
+
+# project test data onto PCs
+test_dtm_projected <- reproject_fn(.dtm = test_dtm, proj_out)
+
+# coerce to matrix
+x_test <- as.matrix(test_dtm_projected)
+
+# compute predicted probabilities
+preds <- predict(fit_reg, 
+                 s = lambda_opt, 
+                 newx = x_test,
+                 type = 'response')
+# store predictions in a data frame with true labels
+pred_df <- test_labels %>%
+  transmute(bclass = factor(bclass)) %>%
+  bind_cols(pred = as.numeric(preds)) %>%
+  mutate(bclass.pred = factor(pred > 0.5, 
+                              labels = levels(bclass)))
+
+# define classification metric panel 
+panel <- metric_set(sensitivity, 
+                    specificity, 
+                    accuracy, 
+                    roc_auc)
+
+# compute test set accuracy
+pred_df %>% panel(truth = bclass, 
+                  estimate = bclass.pred, 
+                  pred, 
+                  event_level = 'second')
+
 ## Step 1: multinomial regression
 #### get multiclass labels
 y_train_multi <- train_labels %>% pull(mclass)
