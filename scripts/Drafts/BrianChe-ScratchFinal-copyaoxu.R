@@ -249,13 +249,13 @@ pred_df2 <- test_bigrams_labels %>%
                               labels = 1))
 
 # define classification metric panel 
-panel <- metric_set(sensitivity, 
+panel2 <- metric_set(sensitivity, 
                     specificity, 
                     accuracy, 
                     roc_auc)
 
 # compute test set accuracy for step 6
-pred_df2 %>% panel(truth = bclass, 
+pred_df2 %>% panel2(truth = bclass, 
                   estimate = bclass.pred, 
                   pred, 
                   event_level = 'second')
