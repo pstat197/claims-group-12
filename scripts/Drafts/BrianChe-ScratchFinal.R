@@ -218,11 +218,12 @@ fit_bigrams <- glmnet(y = y_train_bigrams,
 # Compare predictive accuracy between the model in step 3 and the model in step 6
 
 # choose a strength by cross-validation
+
 set.seed(102722)
 cvout <- cv.glmnet(x = x_train_bigrams, 
                    y = y_train_bigrams, 
-                   family = 'binomial')
-                   # alpha = alpha_enet)
+                   family = 'binomial',
+                   alpha = alpha_enet)
 
 # store optimal strength
 lambda_opt <- cvout$lambda.min
@@ -242,8 +243,6 @@ preds_bigram <- predict(fit_bigrams,
                  newx = x_test_bigrams,
                  type = 'link')
 
-
-fit_bigrams
 # store predictions in a data frame with true labels
 pred_df <- test_bigrams_labels %>%
   transmute(bclass = factor(bclass)) %>%
