@@ -126,12 +126,14 @@ preds <- predict(fit_reg,
                  newx = x_test,
                  type = 'link')
 
+
 # store predictions in a data frame with true labels
 pred_df <- test_labels %>%
   transmute(bclass = factor(bclass)) %>%
   bind_cols(pred = as.numeric(preds)) %>%
   mutate(bclass.pred = factor(pred > 0.5, 
                               labels = levels(bclass)))
+
 
 # define classification metric panel 
 panel <- metric_set(sensitivity, 
@@ -153,7 +155,7 @@ claims_bigrams <- clean %>%
   nlp_fn2()
 
 # partition data for claims_bigrams
-set.seed(198888)
+set.seed(102722)
 partitions_bigrams  <- claims_bigrams %>% initial_split(prop = 0.8)
 
 # separate DTM from labels
@@ -202,14 +204,15 @@ train_bigrams  <- train_bigrams_labels %>%
   transmute(bclass = factor(bclass)) %>%
   bind_cols(train_bigrams_dtm_projected)
 
+
 x_train_bigrams <- train_bigrams  %>% select(-bclass) %>% as.matrix()
 y_train_bigrams <- train_bigrams_labels %>% pull(bclass)
 
 # fit  model
-fit_bigrams <- glmnet(x = x_train_bigrams,
-              y = y_train_bigrams, 
-              offest = preds, 
-              family = 'binomial')
+fit_bigrams <- glmnet(y = y_train_bigrams,
+                      x = x_train_bigrams,
+                      offest = preds, 
+                      family = 'binomial')
 
 #### STEP 7
 # Compare predictive accuracy between the model in step 3 and the model in step 6
@@ -218,8 +221,8 @@ fit_bigrams <- glmnet(x = x_train_bigrams,
 set.seed(102722)
 cvout <- cv.glmnet(x = x_train_bigrams, 
                    y = y_train_bigrams, 
-                   family = 'binomial',
-                   alpha = alpha_enet)
+                   family = 'binomial')
+                   # alpha = alpha_enet)
 
 # store optimal strength
 lambda_opt <- cvout$lambda.min
@@ -239,8 +242,8 @@ preds_bigram <- predict(fit_bigrams,
                  newx = x_test_bigrams,
                  type = 'link')
 
-preds_bigram
 
+fit_bigrams
 # store predictions in a data frame with true labels
 pred_df <- test_bigrams_labels %>%
   transmute(bclass = factor(bclass)) %>%
@@ -265,13 +268,3 @@ pred_df %>% panel(truth = bclass,
 test_bigrams_dtm_projected
 
 
-
-### RANDOM
-#  Fit a logistic regression model with the PC’s obtained in the previous step as predictors and the class labels as response
-train <- train_labels %>%
-  transmute(bclass = factor(bclass)) %>%
-  bind_cols(train_dtm_projected)
-
-fit <- glm(formula=bclass~., data = train, family='binomial')
-
-summary(fit)
