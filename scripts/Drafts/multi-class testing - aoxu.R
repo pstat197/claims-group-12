@@ -18,7 +18,6 @@ library(modelr)
 library(Matrix)
 library(sparsesvd)
 library(glmnet)
-
 # path to activity files on repo
 url <- 'https://raw.githubusercontent.com/pstat197/pstat197a/main/materials/activities/data/'
 
@@ -33,22 +32,22 @@ claims <- paste(url, 'claims-multi-tfidf.csv', sep = '') %>%
 claims
 
 # 1
-# partition data
-set.seed(108888)
+# partition
+set.seed(111422)
 partitions <- claims_clean %>%
   initial_split(prop = 0.8)
 
-# separate DTM from labels
-test_dtm <- testing(partitions) %>%
-  select(-.id, -bclass, -mclass)
-test_labels <- testing(partitions) %>%
-  select(.id, bclass, mclass)
-
-# same, training set
-train_dtm <- training(partitions) %>%
-  select(-.id, -bclass, -mclass)
+train_text <- training(partitions) %>%
+  pull(text_clean)
 train_labels <- training(partitions) %>%
-  select(.id, bclass, mclass)
+  pull(mclass) %>%
+  as.numeric() - 1
+
+test_text <- testing(partitions) %>%
+  pull(text_clean)
+test_labels <- testing(partitions) %>%
+  pull(mclass) %>%
+  as.numeric() - 1
 
 
 # find projections based on training data
