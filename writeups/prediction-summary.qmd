@@ -1,6 +1,6 @@
 ---
 title: "Predictive modeling of claims status"
-author: 'YOUR NAMES HERE'
+author: 'Brian Che, Anya Macomber, Lyndsey Umsted, Ao Xu'
 date: today
 ---
 
