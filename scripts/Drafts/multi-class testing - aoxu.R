@@ -1,3 +1,5 @@
+# Primary task b) multi-class prediction
+
 source('scripts/preprocessing.R')
 load('data/claims-raw.RData')
 
