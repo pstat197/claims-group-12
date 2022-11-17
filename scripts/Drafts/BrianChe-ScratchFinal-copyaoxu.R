@@ -146,6 +146,7 @@ pred_df %>% panel(truth = bclass,
                   estimate = bclass.pred, 
                   pred, 
                   event_level = 'second')
+# The accuracy is 0.685.
 
 #### STEP 5
 # Repeat 1-2 but using bigram tokenization in step 1
@@ -218,47 +219,50 @@ fit_bigrams <- glmnet(y = y_train_bigrams,
 # choose a strength by cross-validation
 
 set.seed(102722)
-cvout2 <- cv.glmnet(x = x_train_bigrams, 
-                   y = y_train_bigrams, 
+cvout <- cv.glmnet(x = x_train_bigrams, 
+                   y = y_train, 
                    family = 'binomial',
                    alpha = alpha_enet)
 
 # store optimal strength
-lambda_opt2 <- cvout2$lambda.min
+lambda_opt <- cvout$lambda.min
 
 # view results
-cvout2
+cvout
+
 
 # project test data onto PCs
-test_bigrams_dtm_projected <- reproject_fn(.dtm = test_bigrams_dtm, proj_bigrams_out)
+test_dtm_projected <- reproject_fn(.dtm = test_dtm, proj_out)
 
 # coerce to matrix
-x_test_bigrams <- as.matrix(test_bigrams_dtm_projected)
+x_test <- as.matrix(test_dtm_projected)
 
 # compute predicted probabilities
-preds_bigram <- predict(fit_bigrams, 
+preds <- predict(fit_reg, 
                  s = lambda_opt, 
-                 newx = x_test_bigrams,
+                 newx = x_test,
                  type = 'response')
 
+
+
 # store predictions in a data frame with true labels
-pred_df2 <- test_bigrams_labels %>%
+pred_df2 <- test_labels %>%
   transmute(bclass = factor(bclass)) %>%
-  bind_cols(pred = as.numeric(preds_bigram)) %>%
+  bind_cols(pred = as.numeric(preds)) %>%
   mutate(bclass.pred = factor(pred > 0.5, 
-                              labels = 1))
+                              labels = levels(bclass)))
 
 # define classification metric panel 
-panel2 <- metric_set(sensitivity, 
+panel <- metric_set(sensitivity, 
                     specificity, 
                     accuracy, 
                     roc_auc)
 
-# compute test set accuracy for step 6
-pred_df2 %>% panel2(truth = bclass, 
-                  estimate = bclass.pred, 
-                  pred, 
-                  event_level = 'second')
+# compute test set accuracy
+pred_df2 %>% panel(truth = bclass, 
+                   estimate = bclass.pred, 
+                   pred, 
+                   event_level = 'second')
 
 # compute test set accuracy for step 3
 pred_df %>% panel(truth = bclass, 
