@@ -185,7 +185,7 @@ train_bigrams_labels %>%
 
 # Project the DTM onto a number of principal components k of your choosing
 # find projections based on training data
-proj_bigrams_out <- projection_fn(.dtm = train_bigrams_dtm, .prop = 0.7)
+proj_bigrams_out <- projection_fn(.dtm = train_bigrams_dtm, .prop = 0.8)
 
 train_bigrams_dtm_projected <- proj_bigrams_out$data
 
