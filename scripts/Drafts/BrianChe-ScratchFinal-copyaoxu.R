@@ -264,10 +264,8 @@ pred_df2 %>% panel(truth = bclass,
                    pred, 
                    event_level = 'second')
 
-# compute test set accuracy for step 3
-pred_df %>% panel(truth = bclass, 
-                  estimate = bclass.pred, 
-                  pred, 
-                  event_level = 'second')
+# The predictive accuracy we get is 0.577 for step 6.
+# Since the predictive accuracy is 0.685 for step 3.
+# So we conclude that the bigrams didn't help to improve the accuracy..
 
 
