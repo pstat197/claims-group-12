@@ -97,7 +97,12 @@ history2 <- model2 %>%
 
 ## CHECK TEST SET ACCURACY HERE
 model2$weights
-evaluate(model2, test_text, test_labels)
+evaluation2 <- evaluate(model2, test_text, test_labels)
 
 # model has accuracy of 0.5981 which is smaller than 
 # the accuracy of 0.77 we got in task 1
+
+# Save an object to a file
+saveRDS(history2, file = "results/preds-group[N].RData")
+saveRDS(evaluation2, file = "results/preds-group[N].RData")
+
