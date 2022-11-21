@@ -1,3 +1,20 @@
+
+source('https://raw.githubusercontent.com/pstat197/pstat197a/main/materials/scripts/package-installs.R')
+
+# packages
+library(tidyverse)
+library(tidymodels)
+library(modelr)
+library(Matrix)
+library(sparsesvd)
+library(glmnet)
+
+# path to activity files on repo
+url <- 'https://raw.githubusercontent.com/pstat197/pstat197a/main/materials/activities/data/'
+
+# load a few functions for the activity
+source(paste(url, 'projection-functions.R', sep = ''))
+
 ## PREPROCESSING
 #################
 source('scripts/preprocessing.R')
@@ -38,6 +55,9 @@ test_text <- testing(partitions) %>%
 test_labels <- testing(partitions) %>%
   pull(bclass) %>%
   as.numeric() - 1
+
+proj_out <- projection_fn(.dtm = train_text, .prop = 0.7)
+train_dtm_projected <- proj_out$data
 
 # create a preprocessing layer
 preprocess_layer <- layer_text_vectorization(
