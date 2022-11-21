@@ -8,7 +8,7 @@ date: today
 
 Provide a 3-5 sentence summary of your work on the primary task. Indicate what input data was used, what method was used for binary class predictions, what method was used for multiclass predictions, and what estimated accuracies were achieved.
 
-> *Header and paragraph content was scraped from the raw webpages and processed into term frequencies of word tokens. For binary classification, a two-layer neural network yielded an estimated 81.4% accuracy; for multiclass classification, a support vector machine gave 78% accuracy. We input the data claims_clean. For binary class and multiclass predictions, we used the partition, a preprocessing layer, NN architecture. The accuracy are 0.81 and 0.60 * 
+> *Header and paragraph content was scraped from the raw webpages and processed into term frequencies of word tokens. For binary classification, a two-layer neural network yielded an estimated 81.4% accuracy; for multiclass classification, a support vector machine gave 78% accuracy. We input the data claims_clean. For binary class and multiclass predictions, we used the partition, a preprocessing layer, NN architecture. The accuracy are 0.81 and 0.60.* 
 
 ### Preprocessing
 
@@ -16,12 +16,51 @@ In one paragraph lay out your preprocessing pipeline. No need to provide exact s
 
 -   what text content was extracted from HTML
 
-* *
+> *contexts in words*
 
 -   how text was cleaned
 
+> *specifies new column name, specifies column containing text, how to tokenize, and optional stopword removal*
+
 -   how cleaned text was represented quantitatively
 
+> *By using the function nlp_fn and parse_fn: nlp_fn <- function(parse_data.out){
+  out <- parse_data.out %>%
+    unnest_tokens(output = token,
+                  input = text_clean,
+                  token = 'words', ## need to switch to n grams
+                  stopwords = str_remove_all(stop_words$word,
+                                             '[[:punct:]]')) %>%
+    mutate(token.lem = lemmatize_words(token)) %>%
+    filter(str_length(token.lem) > 2) %>%
+    count(.id, bclass, token.lem, name = 'n') %>%
+    bind_tf_idf(term = token.lem,
+                document = .id,
+                n = n) %>%
+    pivot_wider(id_cols = c('.id', 'bclass'),
+                names_from = 'token.lem',
+                values_from = 'tf_idf',
+                values_fill = 0)
+  return(out)
+}
+parse_fn <- function(.html){
+  read_html(.html) %>%
+    html_elements(c('h','p')) %>%
+    html_text2() %>%
+    str_c(collapse = ' ') %>%
+    rm_url() %>%
+    rm_email() %>%
+    str_remove_all('\'') %>%
+    str_replace_all(paste(c('\n', 
+                            '[[:punct:]]', 
+                            'nbsp', 
+                            '[[:digit:]]', 
+                            '[[:symbol:]]'),
+                          collapse = '|'), ' ') %>%
+    str_replace_all("([a-z])([A-Z])", "\\1 \\2") %>%
+    tolower() %>%
+    str_replace_all("\\s+", " ")
+*
 
 ### Methods
 
@@ -34,8 +73,21 @@ Describe your final predictive models. Include one paragraph with details on the
 -   training method
 
 
+
 ### Results
 
 Indicate the predictive accuracy of the binary classifications and the multiclass classifications. Provide a table for each, and report sensitivity, specificity, and accuracy.[^1]
 
 [^1]: Read [this article](https://yardstick.tidymodels.org/articles/multiclass.html) on multiclass averaging.
+
+> *For Binary, 
+1 sensitivity binary         0.517
+2 specificity binary         0.868
+3 accuracy    binary         0.685
+4 roc_auc     binary         0.796
+For multiclass,
+1 sensitivity binary         0.931
+2 specificity binary         0.189
+3 accuracy    binary         0.577
+4 roc_auc     binary         0.773
+*
