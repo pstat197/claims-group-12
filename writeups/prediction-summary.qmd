@@ -72,7 +72,32 @@ Describe your final predictive models. Include one paragraph with details on the
 
 -   training method
 
-
+> *For binary classification, we use the logistic regression model, create a preprocessing layer and define NN architecture.
+For the training method, we use the 
+model %>% compile(
+  loss = 'binary_crossentropy',
+  optimizer = optimizer_sgd(),
+  metrics = 'binary_accuracy'
+)
+# train
+history <- model %>%
+  fit(train_text, 
+      train_labels,
+      validation_split = 0.3,
+      epochs = 5)
+For multiclass approach, we use the logistic regression model, create a preprocessing layer and define NN architecture.
+For the training method, we use the 
+model2 %>% compile(
+  loss = 'multiclass_crossentropy',
+  optimizer = optimizer_sgd(),
+  metrics = 'mutliclass_accuracy'
+)
+# train
+history2 <- model2 %>%
+  fit(train_text, 
+      train_labels,
+      validation_split = 0.3,
+      epochs = 5)*
 
 ### Results
 
