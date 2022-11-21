@@ -96,8 +96,8 @@ history2 <- model2 %>%
       epochs = 5)
 
 ## CHECK TEST SET ACCURACY HERE
-model$weights
-evaluate(model, test_text, test_labels)
+model2$weights
+evaluate(model2, test_text, test_labels)
 
-# model has accuracy of 0.81 which is higher than 
+# model has accuracy of 0.5981 which is smaller than 
 # the accuracy of 0.77 we got in task 1
