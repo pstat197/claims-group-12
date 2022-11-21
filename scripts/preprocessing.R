@@ -38,11 +38,15 @@ parse_data <- function(.df){
   return(out)
 }
 
-nlp_fn <- function(parse_data.out){
+parse_data
+
+# Here we change the token to be "ngrams" and n = 2
+nlp_fn2 <- function(parse_data.out){
   out <- parse_data.out %>% 
     unnest_tokens(output = token, 
                   input = text_clean, 
-                  token = 'words',
+                  token = 'ngrams',
+                  n = 2,
                   stopwords = str_remove_all(stop_words$word, 
                                              '[[:punct:]]')) %>%
     mutate(token.lem = lemmatize_words(token)) %>%
@@ -57,3 +61,4 @@ nlp_fn <- function(parse_data.out){
                 values_fill = 0)
   return(out)
 }
+

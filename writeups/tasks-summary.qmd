@@ -1,6 +1,6 @@
 ---
 title: "Summary of exploratory tasks"
-author: 'YOUR NAMES HERE'
+author: 'Brian Che, Anya Macomber, Lyndsey Umsted, Ao Xu'
 date: today
 ---
 
@@ -8,18 +8,22 @@ date: today
 
 Does including header content improve predictions? Answer the question and provide quantitative evidence supporting your answer.
 
+In order to include the header as apart of the text we included 'h' along with 'p' in the html elements of the text parsing of the preprocessing code. Including the header improves our prediction accuracy.
+
 ### Bigrams
 
 Do bigrams capture additional information relevant to the classification of interest? Answer the question, **briefly** describe what analysis you conducted to arrive at your answer, and provide quantitative evidence supporting your answer.
 
+Unfortunately, we couldn't calculate the prediction accuracy for the bigrams due to the prediction bigrams having values under the prediction condition of being greater than 0.5 in the prediction dataframe, causing us to run into an error with being invalid labels expecting 1 when there should be 2, being irrelevant and relevant. Due to this condition of all values being under 0.5, this issue with the prediction bigrams and condition of being higher than 0.5 created an issue with the accuracy, which could be fixed if changing the prediction boundary to one that worked with the prediction bigrams. To arrive at our intial analysis however, we received a prediction accuracy of 68% for the word tokens, using logistic regression with 55 principal components, which was done through projecting the test data onto the PCs to compute the probabilities.
+
 ### Neural net
 
-Summarize the neural network model you trained by desribing:
+Summarize the neural network model you trained by describing:
 
--   architecture
+-   architecture: For the architecture of the Neural Network model we trained, we applied the preprocessing layer, changed the layer_dropout to 0.75 instead of the original 0.25, we kept the first layer_dense to 25 units, and also kept the second layer_dense to 1 unit.
 
--   optimization and loss
+-   optimization and loss: We kept loss as binary cross entropy and the optimizer remained as 'adam'
 
--   training epochs
+-   training epochs: We kept loss as binary cross entropy and the optimizer remained as 'adam'
 
--   predictive accuracy
+-   predictive accuracy: Each of these components resulted in a predictive accuracy of 0.81 on the test set. This is a 3% improvement from the neural network model in task 1 which had a predictive accuracy of 0.77.
