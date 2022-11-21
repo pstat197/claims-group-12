@@ -34,7 +34,7 @@ train_text <- training(partitions) %>%
 train_labels <- training(partitions) %>%
   pull(bclass) %>%
   as.numeric() - 1
-train_text
+
 test_text <- testing(partitions) %>%
   pull(text_clean)
 test_labels <- testing(partitions) %>%

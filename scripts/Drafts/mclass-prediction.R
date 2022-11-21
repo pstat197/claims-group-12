@@ -57,9 +57,6 @@ test_labels <- testing(partitions) %>%
   pull(bclass) %>%
   as.numeric() - 1
 
-proj_out <- projection_fn(.dtm = train_text, .prop = 0.7)
-train_dtm_projected <- proj_out$data
-
 # create a preprocessing layer
 preprocess_layer <- layer_text_vectorization(
   standardize = NULL,
@@ -74,7 +71,7 @@ preprocess_layer %>% adapt(train_text)
 
 # changed layer_dropout from 0.25 to 0.75
 # define NN architecture
-model <- keras_model_sequential() %>%
+model2 <- keras_model_sequential() %>%
   preprocess_layer() %>%
   layer_dropout(0.50) %>%
   layer_dense(units = 25) %>%
@@ -82,17 +79,17 @@ model <- keras_model_sequential() %>%
   layer_dense(1) %>%
   layer_activation(activation = 'sigmoid')
 
-summary(model)
+summary(model2)
 
 # configure for training
-model %>% compile(
-  loss = 'multiclass_crossentropy',
+model2 %>% compile(
+  loss = 'binary_crossentropy',
   optimizer = optimizer_sgd(),
-  metrics = 'multiclass_accuracy'
+  metrics = 'binary_accuracy'
 )
 
 # train
-history <- model %>%
+history2 <- model2 %>%
   fit(train_text, 
       train_labels,
       validation_split = 0.3,
