@@ -1,25 +1,6 @@
-# Primary task b) multi-class prediction
-# Primary task a) binary class prediction
-
 ## PREPROCESSING
 #################
 source('scripts/preprocessing.R')
-
-source('https://raw.githubusercontent.com/pstat197/pstat197a/main/materials/scripts/package-installs.R')
-
-# packages
-library(tidyverse)
-library(tidymodels)
-library(modelr)
-library(Matrix)
-library(sparsesvd)
-library(glmnet)
-
-# path to activity files on repo
-url <- 'https://raw.githubusercontent.com/pstat197/pstat197a/main/materials/activities/data/'
-
-# load a few functions for the activity
-source(paste(url, 'projection-functions.R', sep = ''))
 
 # load raw data
 load('data/claims-raw.RData')
@@ -41,28 +22,6 @@ require(tensorflow)
 # load cleaned data
 load('data/claims-clean-example.RData')
 
-# partition data
-set.seed(102722)
-partitions <- claims_clean%>% initial_split(prop = 0.8)
-
-# separate DTM from labels
-test_dtm <- testing(partitions) %>%
-  select(-.id, -bclass, -mclass)
-test_labels <- testing(partitions) %>%
-  select(.id, bclass, mclass)
-
-# same, training set
-train_dtm <- training(partitions) %>%
-  select(-.id, -bclass, -mclass)
-train_labels <- training(partitions) %>%
-  select(.id, bclass, mclass)
-
-# find projections based on training data
-proj_out <- projection_fn(.dtm = train_dtm, .prop = 0.7)
-train_dtm_projected <- proj_out$data
-
-# how many components were used?
-proj_out$n_pc
 # partition
 set.seed(111422)
 partitions <- claims_clean %>%
@@ -77,7 +36,7 @@ train_labels <- training(partitions) %>%
 test_text <- testing(partitions) %>%
   pull(text_clean)
 test_labels <- testing(partitions) %>%
-  pull(mclass) %>%
+  pull(bclass) %>%
   as.numeric() - 1
 
 # create a preprocessing layer
