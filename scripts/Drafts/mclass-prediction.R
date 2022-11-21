@@ -1,3 +1,4 @@
+# Primary task b) multi-class prediction
 
 source('https://raw.githubusercontent.com/pstat197/pstat197a/main/materials/scripts/package-installs.R')
 
