@@ -8,13 +8,15 @@ date: today
 
 Provide a 3-5 sentence summary of your work on the primary task. Indicate what input data was used, what method was used for binary class predictions, what method was used for multiclass predictions, and what estimated accuracies were achieved.
 
-> *Header and paragraph content was scraped from the raw webpages and processed into term frequencies of word tokens. For binary classification, a two-layer neural network yielded an estimated 81.4% accuracy; for multiclass classification, a support vector machine gave 78% accuracy.* 
+> *Header and paragraph content was scraped from the raw webpages and processed into term frequencies of word tokens. For binary classification, a two-layer neural network yielded an estimated 81.4% accuracy; for multiclass classification, a support vector machine gave 78% accuracy. We input the data claims_clean. For binary class and multiclass predictions, we used the partition, a preprocessing layer, NN architecture. The accuracy are 0.81 and 0.60 * 
 
 ### Preprocessing
 
 In one paragraph lay out your preprocessing pipeline. No need to provide exact step-by-step detail; just give an overview of the main components:
 
 -   what text content was extracted from HTML
+
+* *
 
 -   how text was cleaned
 
